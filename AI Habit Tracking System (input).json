@@ -1,0 +1,140 @@
+{
+  "name": "AI Habit Tracking System (input)",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AI Habit Tracking System",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name of Activity",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "How many hours?",
+              "fieldType": "number",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "68cd2a87-a3e7-4b45-aa75-7b131d0bf64e",
+      "name": "On form submission",
+      "webhookId": "cd25aa18-289f-428a-a2e9-a364bb529063"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1qLuHjP_2bR0HlnBkB0Yqw6xQcFGIOt2B4I5NY2NNtv8/",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qLuHjP_2bR0HlnBkB0Yqw6xQcFGIOt2B4I5NY2NNtv8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name of Activity": "={{ $json['Name of Activity'] }}",
+            "How many hour(s)": "={{ $json['How many hours?'] }}",
+            "Inputted datetime": "={{ $json.submittedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name of Activity",
+              "displayName": "Name of Activity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "How many hour(s)",
+              "displayName": "How many hour(s)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Inputted datetime",
+              "displayName": "Inputted datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4c8f50d3-aa7e-4d8a-9f1f-5555473054f1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dL1yU3redycM9KiC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "402428e5-d36c-47b8-af35-273a6f29dd82",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c021620e1adaefbdd36f3f287308f33166e9a0ce4ca5bee8991bcb69042daed3"
+  },
+  "id": "nFaFjj8m92EYaXe4",
+  "tags": []
+}

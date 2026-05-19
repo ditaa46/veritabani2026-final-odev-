@@ -1,0 +1,197 @@
+{
+  "name": "AI Habit Tracking System (result)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6bfd8b11-69f0-4bb1-a975-23cd26839185",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1qLuHjP_2bR0HlnBkB0Yqw6xQcFGIOt2B4I5NY2NNtv8",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qLuHjP_2bR0HlnBkB0Yqw6xQcFGIOt2B4I5NY2NNtv8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ef9d4b65-cedb-4ae2-861e-6345be1d13a6",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "dL1yU3redycM9KiC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Please analyze this \"Array of data\" below, then give output of this person habit using Output format\", then give advice for what activity should he/she improve or what he/she should reduce to be normal Healthy.\n\nOutput format:\n- Calorie burned: ...%\n- Calorie gain: ...%\n- Total time for ... : ... Hours\n- Total time for ... : ... Hours\n(list all the activity and the total time consumed)\n- Advice: give a short 1 line advice.\n\nArray of data: {{ $json.data }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "a25eb155-3e18-4eb8-ba5d-5904fae940bf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        224
+      ],
+      "id": "9d427fc8-522e-4370-9523-e272d605709c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "0ufLvbw3W1zFtApg",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\n\nconst list = rows.map((item) => {\n  return {\n    activity: item.json[\"Name of Activity\"],\n    hours: item.json[\"How many hour(s)\"],\n    inputed_time: item.json[\"Inputted datetime\"]\n  };\n});\n\nreturn [\n  {\n    json: {\n      data: JSON.stringify(list, null, 2)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7b01bcd9-2369-4802-88f1-139820bf4f5e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "214410819@ogr.kastamonu.edu.tr",
+        "subject": "AI Habit Tracking Results",
+        "emailType": "text",
+        "message": "=Here is your result\n---------------------------\n{{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "5cf1968e-d450-461b-b884-a9feb55858b6",
+      "name": "Send a message",
+      "webhookId": "24641926-72fa-4b2c-8026-d9511df8240a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "tsgkIRuSodqSQ2iz",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "94fba64b-862b-43a7-819b-e9c9c006bf32",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c021620e1adaefbdd36f3f287308f33166e9a0ce4ca5bee8991bcb69042daed3"
+  },
+  "id": "ZKl1T0iyclEfOQFI",
+  "tags": []
+}
