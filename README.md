@@ -1,0 +1,1 @@
+# veritabani2026-final-odev-
